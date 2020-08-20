@@ -43,6 +43,14 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         Log.d(TAG, "zsr onNewIntent: "+intent?.action)
         val tagNfc = intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent?.action) {
+            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)?.also { rawMessages ->
+                val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
+                Log.d(TAG, "zsr onNewIntent: $messages")
+            }
+        }
+        val id = intent?.getIntExtra(NfcAdapter.EXTRA_ID,0)
+        Log.d(TAG, "zsr onNewIntent: $id")
         val ndefMessage = NdefMessage(arrayOf(NdefRecord.createApplicationRecord(targetName)))
         //获取转换称字节的大小
         val size = ndefMessage.toByteArray().size
