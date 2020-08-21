@@ -28,12 +28,12 @@ android {
 
     //渠道Flavors
     productFlavors {
-        wb01 {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wb01"]
-        }
-        wb02 {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wb02"]
-        }
+        wb01 {}
+        wb02 {}
+    }
+    //manifestPlaceholders 放在这里更简洁
+    productFlavors.all{
+        flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
     }
 
 
@@ -47,25 +47,26 @@ android {
             //输出文件夹
             def outDirectory
             //是否为Jenkins打包，输出路径不同
-            if ("true".equals(IS_JENKINS)) {
+            if ("true" == IS_JENKINS) {
                 //Jenkins打包输出到服务器路径
                 timeNow = BUILD_TIME
                 //BUILD_PATH为服务器输出路径
-                outDirectory = "app/build/jinkens/outputs"
+                outDirectory = output.outputFile.getParent()
                 //AutoBuildTest-v1.0.1-xiaomi-release.apk
-                newName = 'AutoBuildTest-v' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
+                newName = 'NfcDemo-v_jenkins_' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
             } else {
                 //本机打包输出在本机路径
                 timeNow = getDate()
                 outDirectory = output.outputFile.getParent()
-                if ('debug'.equals(variant.buildType.name)) {
-                    newName = "AutoBuildTest-v${APP_VERSION}-debug.apk"
+                if ('debug' == variant.buildType.name) {
+                    newName = "NfcDemo-v${APP_VERSION}-debug.apk"
                 } else {
                     //AutoBuildTest-v1.0.1-xiaomi-release.apk
-                    newName = 'AutoBuildTest-v' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
+                    newName = 'NfcDemo-v' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
                 }
             }
-            outputFileName = new File(outDirectory+'/'+timeNow, newName)
+           // outputFileName = new File(outDirectory+'/'+timeNow, newName)
+            outputFileName = timeNow+"_"+newName
         }
     }
 }
