@@ -47,6 +47,7 @@ android {
             //输出文件夹
             def outDirectory
             //是否为Jenkins打包，输出路径不同
+            println("iskenkins: "+IS_JENKINS+" "+APP_VERSION)
             if ("true" == IS_JENKINS) {
                 //Jenkins打包输出到服务器路径
                 timeNow = BUILD_TIME
@@ -65,6 +66,7 @@ android {
                     newName = 'NfcDemo-v' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
                 }
             }
+            println("apk name "+newName)
            // outputFileName = new File(outDirectory+'/'+timeNow, newName)
             outputFileName = timeNow+"_"+newName
         }
