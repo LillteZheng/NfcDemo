@@ -44,30 +44,23 @@ android {
             def newName
             //时间戳
             def timeNow
-            //输出文件夹
-            def outDirectory
             //是否为Jenkins打包，输出路径不同
             println("iskenkins: "+IS_JENKINS+" "+APP_VERSION)
             if ("true" == IS_JENKINS) {
-                //Jenkins打包输出到服务器路径
+                //Jenkins打包的时间
                 timeNow = BUILD_TIME
-                //BUILD_PATH为服务器输出路径
-                outDirectory = output.outputFile.getParent()
-                //AutoBuildTest-v1.0.1-xiaomi-release.apk
+                //名字
                 newName = 'NfcDemo-v_jenkins_' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
             } else {
-                //本机打包输出在本机路径
+                //本机打包的时间
                 timeNow = getDate()
-                outDirectory = output.outputFile.getParent()
                 if ('debug' == variant.buildType.name) {
                     newName = "NfcDemo-v${APP_VERSION}-debug.apk"
                 } else {
-                    //AutoBuildTest-v1.0.1-xiaomi-release.apk
                     newName = 'NfcDemo-v' + APP_VERSION + '-' + variant.productFlavors[0].name + '-' + variant.buildType.name + '.apk'
                 }
             }
             println("apk name "+newName)
-           // outputFileName = new File(outDirectory+'/'+timeNow, newName)
             outputFileName = timeNow+"_"+newName
         }
     }
