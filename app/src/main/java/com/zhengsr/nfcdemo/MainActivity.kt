@@ -183,7 +183,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logMessage(header: String, text: String?) {
-        cardContent?.append(if (text.isNullOrBlank()) fromHtml("<b>$header</b><br>") else fromHtml("<b>$header</b>: $text<br>"))
+      //  cardContent?.append(if (text.isNullOrBlank()) fromHtml("<b>$header</b><br>") else fromHtml("<b>$header</b>: $text<br>"))
+        Log.d(TAG, "zsr logMessage: $text")
 
     }
 

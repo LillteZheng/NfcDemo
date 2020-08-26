@@ -81,6 +81,8 @@ object NfcUtils {
         }
     }
 
+
+
     fun writeData(msg: String, block: (Boolean, String) -> Unit) {
 
 
@@ -88,6 +90,11 @@ object NfcUtils {
             block(false, "you should getNfcTag to get NFC tag")
             return
         }
+
+
+
+
+        //
         //中文编码
         val langBytes = Locale.CHINA.language.toByteArray(Charset.forName("US-ASCII"))
         //数据类型为 utf-8
@@ -111,7 +118,14 @@ object NfcUtils {
         val record =
             NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, ByteArray(0), data)
         //创建 ndefmessage
-        val ndefMessage = NdefMessage(arrayOf(record))
+       // val ndefMessage = NdefMessage(arrayOf(record))
+        val mimeRecord = NdefRecord.createMime(
+            "application/vnd.com.zhengsr.nfcdemo.nfcutils",
+            msg.toByteArray(Charset.forName("US-ASCII"))
+        )
+        val textRecord = NdefRecord.createTextRecord(Locale.CHINA.language, msg)
+
+        val ndefMessage = NdefMessage(mimeRecord)
         val size = ndefMessage.toByteArray().size
 
         val ndef = Ndef.get(nfcTag)
@@ -145,6 +159,8 @@ object NfcUtils {
         } finally {
             ndef?.close()
         }
+
+
     }
 
 
@@ -160,8 +176,12 @@ object NfcUtils {
                 msg.records ?: return
                 Log.d(TAG, "zsr readNDEFMsg: ${ndef.maxSize} ${msg.records.size}")
 
+                val fs = msg.records[0]
+                val m = String(fs.payload)
+                Log.d(TAG, "zsr readNDEFMsg: $m")
                 val payload = msg.records[0].payload
 
+               
                 //判断语言编码，第7位0位 utf-8，1位utf-16
                 val textEncoding = if ((payload[0].toInt() and 0x80) == 0) "UTF-8" else "Utf-16"
                 //语言编码的长度,0-5bit
