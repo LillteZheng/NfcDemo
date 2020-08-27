@@ -3,11 +3,9 @@ package com.zhengsr.nfcdemo
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.MifareUltralight
-import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Html
@@ -18,6 +16,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.zhengsr.nfclib.NfcType
+import com.zhengsr.nfclib.ZNfc
 
 
 class MainActivity : AppCompatActivity() {
@@ -52,18 +52,32 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         Log.d(TAG, "zsr onNewIntent: " + intent?.action)
 
+        if(ZNfc.init(intent!!).getType() == NfcType.EDEF){
+            val delegate = ZNfc.getNDEFDelegate()
+            cardId.text = fromHtml("卡ID: ${delegate.getCardId()}")
+
+            val data = delegate.readData()
+            data?.let {
+                cardContent.text = it.msg
+            }
+
+        }
+
+       /* ZNfc.getNDEFDelegate()
 
         val tagNfc = intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
 
         val id = NfcUtils.init(intent).readNfcId()
         id?.let {
-            cardId.text = fromHtml("卡ID: $it")
+
         }
+
 
 
         NfcUtils.readNfcMsg(intent){
             cardContent.text = it
-        }
+        }*/
+
 
         /*Log.d(TAG, "zsr onNewIntent: $id")
         when (intent?.action) {
@@ -213,9 +227,15 @@ class MainActivity : AppCompatActivity() {
     fun write(view: View) {
         val msgEd = findViewById<EditText>(R.id.msg_ed)
         val msg = msgEd.text.toString()
-        NfcUtils.writeData(msg){ isSuccess,msg->
+        ZNfc.getNDEFDelegate().writeMsg(msg){ isSuccess,msg->
             if (isSuccess){
                 Toast.makeText(this, "数据写入成功", Toast.LENGTH_SHORT).show()
+                if (ZNfc.getType() == NfcType.EDEF) {
+                    val data = ZNfc.getNDEFDelegate().readData()
+                    data?.let {
+                        cardContent.text = it.msg
+                    }
+                }
             }else{
                 Toast.makeText(this, "数据写入失败: $msg", Toast.LENGTH_SHORT).show()
             }
