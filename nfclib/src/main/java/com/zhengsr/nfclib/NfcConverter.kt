@@ -3,8 +3,9 @@ package com.zhengsr.nfclib
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.tech.Ndef
 import com.zhengsr.nfclib.delegate.INFcDelegate
-import com.zhengsr.nfclib.delegate.NDEFDelegate
+import com.zhengsr.nfclib.delegate.ndef.NDEFDelegate
 import com.zhengsr.nfclib.kt.bytesToHexString
 import java.lang.RuntimeException
 
@@ -16,7 +17,7 @@ import java.lang.RuntimeException
 internal class NfcConverter {
 
 
-    lateinit var intent: Intent
+    private lateinit var intent: Intent
     private var nfcTag: Tag? = null
 
     companion object {
@@ -66,6 +67,25 @@ internal class NfcConverter {
             }
              else -> null
         }
+    }
+
+    internal fun setIntent(intent: Intent): NfcType {
+        this.intent = intent
+        var type = NfcType.UNKOWN
+         when (intent.action) {
+            NfcAdapter.ACTION_NDEF_DISCOVERED -> {
+               type = NfcType.EDEF
+            }
+            NfcAdapter.ACTION_TAG_DISCOVERED ->{
+                getNfcTag()?.techList?.forEach {
+                    when(it){
+                        Ndef::class.java.name -> type = NfcType.EDEF
+                    }
+                }
+
+            }
+        }
+        return type
     }
 
 

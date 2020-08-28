@@ -1,9 +1,7 @@
 package com.zhengsr.nfclib
 
 import android.content.Intent
-import android.nfc.NfcAdapter
-import android.nfc.tech.Ndef
-import com.zhengsr.nfclib.delegate.NDEFDelegate
+import com.zhengsr.nfclib.delegate.ndef.NDEFDelegate
 import java.lang.RuntimeException
 
 /**
@@ -18,22 +16,7 @@ object ZNfc {
 
     fun init(intent: Intent): ZNfc {
         val converter = NfcConverter.instance
-        converter.intent = intent
-
-        when (intent.action) {
-            NfcAdapter.ACTION_NDEF_DISCOVERED -> {
-                type = NfcType.EDEF
-            }
-            NfcAdapter.ACTION_TAG_DISCOVERED ->{
-                converter.getNfcTag()?.techList?.forEach {
-                    when(it){
-                        Ndef::class.java.name -> type= NfcType.EDEF
-                    }
-                }
-
-            }
-        }
-
+        type = converter.setIntent(intent)
         return this
     }
 
@@ -43,9 +26,9 @@ object ZNfc {
     }
 
 
-    fun getNDEFDelegate(): NDEFDelegate{
+    fun getNDEFDelegate(): NDEFDelegate {
         if (type != NfcType.EDEF){
-            throw RuntimeException("you card cannot support NDEF")
+            throw RuntimeException("your NfcCard cannot support NDEF")
         }
         return NfcConverter.instance.getDelegate(type) as NDEFDelegate
     }
