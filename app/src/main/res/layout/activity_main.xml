@@ -7,59 +7,17 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="4dp"
-        android:layout_margin="10dp"
-        android:layout_height="220dp">
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/card_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/content"
-                app:layout_constraintStart_toStartOf="@id/content"
-                android:textSize="14sp"
-                android:layout_margin="20dp"
-                />
-
-            <TextView
-                android:id="@+id/card_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/card_id"
-                app:layout_constraintStart_toStartOf="@id/content"
-                android:padding="10dp"
-                android:textColor="#323232"
-                android:textSize="18sp"
-
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </androidx.cardview.widget.CardView>
-
-    <EditText
-        android:id="@+id/msg_ed"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="请输入数据"
-        />
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="write"
-        android:text="确定"/>
+        android:onClick="mainCard"
+        android:text="模拟NFC卡"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="readNfc"
+        android:text="读取NFC卡"/>
 
 
 </LinearLayout>

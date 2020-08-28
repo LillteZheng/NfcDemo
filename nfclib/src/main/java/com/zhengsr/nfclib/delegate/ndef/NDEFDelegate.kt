@@ -56,10 +56,6 @@ class NDEFDelegate : INFcDelegate() {
         }
     }
 
-    fun write(){
-
-    }
-
 
     fun writeMsg(msg: String, block: (Boolean, String) -> Unit) {
         val record =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
