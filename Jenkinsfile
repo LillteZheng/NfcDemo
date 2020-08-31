@@ -1,5 +1,5 @@
 //这个是 Jenkins 的脚本,脚本化流水线语法的关键部分.
-node('apk'){
+node(){
     //编译命令
     BUILD_COMMAND = "./gradlew clean assembleRelease"
 
