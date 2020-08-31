@@ -1,13 +1,12 @@
 //这个是 Jenkins 的脚本,脚本化流水线语法的关键部分.
 node('apk'){
-
     //编译命令
     BUILD_COMMAND = "./gradlew clean assembleRelease"
 
     //配置apk生成路径
-    env.APK_PATH = ${env.WORKSPACE}/app/build/outputs/apk
+    env.APK_PATH = "${env.WORKSPACE}/app/build/outputs/apk"
     //未签名apk路径，jenkins会取未签名的apk进行签名，然后存档
-    env.APK_TO_SIGN = /app/build/outputs/*-unsigned.apk
+    env.APK_TO_SIGN = "/app/build/outputs/*-unsigned.apk"
 
     try{
         //stage 是任务块
@@ -23,17 +22,7 @@ node('apk'){
         stage('Build'){
             sh "${BUILD_COMMAND}"
         }
-        //签名
-        stage('Sign apk'){
-            //签名
-            signAndroidApks(
-                keyStoreId: "androiddebugkey",
-                keyAlias: "",
-                apksToSign: "${env.APK_TO_SIGN}",
-                archiveSignedApks :true
-            )
 
-        }
         currentBuild.result = 'SUCCESS'
 
     }catch(err){
