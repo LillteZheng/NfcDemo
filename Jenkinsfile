@@ -34,10 +34,10 @@ node('apk'){
             )
 
         }
-        echo "Success"
+        currentBuild.result = 'SUCCESS'
 
     }catch(err){
-        echo "Fail"
+        currentBuild.result = 'FAIL'
         throw err
     }
 
