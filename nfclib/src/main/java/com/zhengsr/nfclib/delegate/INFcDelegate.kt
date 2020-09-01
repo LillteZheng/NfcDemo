@@ -21,5 +21,6 @@ abstract class INFcDelegate {
     }
 
 
+
 }
 

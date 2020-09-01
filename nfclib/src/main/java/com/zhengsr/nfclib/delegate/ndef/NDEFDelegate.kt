@@ -32,7 +32,7 @@ class NDEFDelegate : INFcDelegate() {
 
     }
 
-    internal fun getConverter(converter: NfcConverter): NDEFDelegate {
+    internal fun ConveterDispatcher(converter: NfcConverter): NDEFDelegate {
         //拿得到ndef，则tag一定有的
         tag = converter.getNfcTag()!!
         return this
@@ -57,12 +57,24 @@ class NDEFDelegate : INFcDelegate() {
     }
 
 
+    fun write(msg: String, block: (Boolean, String) -> Unit){
+        val resord = NdefRecord.createApplicationRecord("com.zhengsr.nfcdemo")
+        val message = NdefMessage(arrayOf(resord))
+        writeNdefData(block, msg.length, message)
+    }
+
     fun writeMsg(msg: String, block: (Boolean, String) -> Unit) {
         val record =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             NdefRecord.createTextRecord(Locale.CHINA.language, msg)
         } else {
             NdefRecord.createMime("text/plain", msg.toByteArray())
         }
+        val message = NdefMessage(arrayOf(record))
+        writeNdefData(block, msg.length, message)
+    }
+
+    fun writeMime(mime:String,msg:String,block: (Boolean, String) -> Unit){
+        val record = NdefRecord.createMime(mime,msg.toByteArray())
         val message = NdefMessage(arrayOf(record))
         writeNdefData(block, msg.length, message)
     }
@@ -128,6 +140,7 @@ class NDEFDelegate : INFcDelegate() {
     private fun getNfcRecord(ndefRecord: NdefRecord): NfcRecord? {
         return RecordDelegate.getRecordFromTnf(ndefRecord)
     }
+
 
 
 

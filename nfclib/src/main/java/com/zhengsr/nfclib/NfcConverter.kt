@@ -64,7 +64,7 @@ internal class NfcConverter {
         checkIntent()
         return when (type) {
             NfcType.EDEF -> {
-                return NDEFDelegate.instance.getConverter(this)
+                return NDEFDelegate.instance.ConveterDispatcher(this)
             }
             else -> null
         }
@@ -87,6 +87,8 @@ internal class NfcConverter {
         }
         return type
     }
+
+
 
 
 }

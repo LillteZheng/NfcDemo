@@ -2,6 +2,7 @@ package com.zhengsr.nfclib.delegate.ndef
 
 import android.net.Uri
 import android.nfc.NdefRecord
+import android.util.Log
 import com.zhengsr.nfclib.bean.NfcRecord
 import java.nio.charset.Charset
 import java.util.*
@@ -20,6 +21,7 @@ internal object RecordDelegate {
      * 根据类型，返回需要的NfcRecord
      */
     fun getRecordFromTnf(record: NdefRecord): NfcRecord? {
+
 
         return when (record.tnf) {
             NdefRecord.TNF_EXTERNAL_TYPE -> {
@@ -60,11 +62,11 @@ internal object RecordDelegate {
     }
 
     /**
-     * Constructs MIME or JSON NfcRecord
+     * Constructs MIME  NfcRecord
      */
     private fun createMIMERecord(mediaType: String, payload: ByteArray): NfcRecord? {
         val bean = NfcRecord()
-        bean.recordType = NfcRecord.TYPE_TEXT
+        bean.recordType = NfcRecord.TYPE_MIME
         bean.data = payload
         bean.msg = String(payload)
         return bean

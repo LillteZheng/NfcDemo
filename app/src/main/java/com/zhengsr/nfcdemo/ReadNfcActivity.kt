@@ -3,8 +3,7 @@ package com.zhengsr.nfcdemo
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.nfc.tech.IsoDep
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
@@ -22,7 +21,6 @@ class ReadNfcActivity : AppCompatActivity() {
     private val TAG = "ReadNfcActivity"
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
-    private val targetName = "com.android.mms"
     private lateinit var cardContent: TextView
     private lateinit var cardId : TextView
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,14 +41,17 @@ class ReadNfcActivity : AppCompatActivity() {
         pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
 
+        Log.d(TAG, "zsr onCreate: ${intent}")
     }
 
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.d(TAG, "zsr onNewIntent: " + intent?.action)
+        Log.d(TAG, "zsr onNewIntent: $intent")
+        //注册intent
+        ZNfc.inject(intent!!)
+        if(ZNfc.getType() == NfcType.EDEF){
 
-        if(ZNfc.init(intent!!).getType() == NfcType.EDEF){
             val delegate = ZNfc.getNDEFDelegate()
             cardId.text = fromHtml("卡ID: ${delegate.getCardId()}")
 
@@ -89,9 +90,10 @@ class ReadNfcActivity : AppCompatActivity() {
     fun write(view: View) {
         val msgEd = findViewById<EditText>(R.id.msg_ed)
         val msg = msgEd.text.toString()
-        val domain = "com.zhengsr" //usually your app's package name
-        val type = "nfcdemo"
-        ZNfc.getNDEFDelegate().writeMsg(msg){ isSuccess, msg->
+        val domain = "com.zhengsr.nfcdemo" //usually your app's package name
+        val type = "externalType"
+        val mime = "application/com.zhengsr.nfctest";
+        ZNfc.getNDEFDelegate().writeMime(mime,msg){ isSuccess, result->
             if (isSuccess){
                 Toast.makeText(this, "数据写入成功", Toast.LENGTH_SHORT).show()
                 if (ZNfc.getType() == NfcType.EDEF) {
@@ -101,7 +103,7 @@ class ReadNfcActivity : AppCompatActivity() {
                     }
                 }
             }else{
-                Toast.makeText(this, "数据写入失败: $msg", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "数据写入失败: $result", Toast.LENGTH_SHORT).show()
             }
             msgEd.setText("")
         }

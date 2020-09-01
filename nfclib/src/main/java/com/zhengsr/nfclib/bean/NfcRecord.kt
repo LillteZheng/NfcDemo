@@ -9,6 +9,7 @@ class NfcRecord {
         const val TYPE_TEXT = 1
         const val TYPE_URI = 2
         const val TYPE_EXTERNAL = 3
+        const val TYPE_MIME = 4
     }
 
     var recordType = TYPE_TEXT

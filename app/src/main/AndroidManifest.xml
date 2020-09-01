@@ -36,7 +36,18 @@
         </service>
 
         <activity android:name=".HostCardActivity" />
-        <activity android:name=".ReadNfcActivity" />
+
+
+        <activity android:name=".ReadNfcActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/com.zhengsr.nfctest"/>
+
+
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop">
@@ -44,6 +55,8 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+
             </intent-filter>
         </activity>
 
