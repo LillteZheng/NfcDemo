@@ -13,10 +13,11 @@ class NfcRecord {
     }
 
     var recordType = TYPE_TEXT
+    var mediaType: String? = null
     var msg: String? = null
     var data: ByteArray? = null
     override fun toString(): String {
-        return "NdefData(recordType=$recordType, msg=$msg, data=${data?.contentToString()})"
+        return "NfcRecord(recordType=$recordType, mediaType=$mediaType, msg=$msg, data=${data?.contentToString()})"
     }
 
 

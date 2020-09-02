@@ -1,6 +1,7 @@
 package com.zhengsr.nfclib.delegate
 
 import android.content.Intent
+import android.nfc.NdefRecord
 import android.nfc.Tag
 import com.zhengsr.nfclib.NfcConverter
 
@@ -19,8 +20,6 @@ abstract class INFcDelegate {
     fun getNfcTag(): Tag? {
         return NfcConverter.instance.getNfcTag()
     }
-
-
 
 }
 

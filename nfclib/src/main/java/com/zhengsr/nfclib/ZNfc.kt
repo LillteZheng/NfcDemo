@@ -2,6 +2,7 @@ package com.zhengsr.nfclib
 
 import android.content.Intent
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import com.zhengsr.nfclib.delegate.ndef.NDEFDelegate
 import java.lang.RuntimeException
 
@@ -9,7 +10,7 @@ import java.lang.RuntimeException
  * @author by zhengshaorui 2020/8/26 19:38
  * describe：
  */
-typealias NfcListener = (String) -> Unit
+typealias NfcWriteListener = (Boolean, String) -> Unit
 
 object ZNfc {
     private const val TAG = "ZNfc"
@@ -20,6 +21,9 @@ object ZNfc {
         return this
     }
 
+    fun getNfcTag(): Tag? {
+        return NfcConverter.instance.getNfcTag()
+    }
 
     fun getType(): NfcType {
         return type

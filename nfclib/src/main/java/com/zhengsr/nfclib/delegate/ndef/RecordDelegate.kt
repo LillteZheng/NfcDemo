@@ -2,7 +2,6 @@ package com.zhengsr.nfclib.delegate.ndef
 
 import android.net.Uri
 import android.nfc.NdefRecord
-import android.util.Log
 import com.zhengsr.nfclib.bean.NfcRecord
 import java.nio.charset.Charset
 import java.util.*
@@ -16,7 +15,7 @@ internal object RecordDelegate {
 
     private val TAG = "RecordDelegate"
 
-
+    private const val TEXT_MIME = "text/plain"
     /**
      * 根据类型，返回需要的NfcRecord
      */
@@ -28,13 +27,10 @@ internal object RecordDelegate {
                 createExternalRecord(record)
             }
             NdefRecord.TNF_ABSOLUTE_URI -> {
-                return createURLRecord(record.toUri())
+                return createURLRecord(record)
             }
             NdefRecord.TNF_MIME_MEDIA ->
-                return createMIMERecord(
-                    String(record.type, Charset.forName("UTF-8")),
-                    record.payload
-                )
+                return createMIMERecord(record)
             NdefRecord.TNF_WELL_KNOWN -> return createWellKnownRecord(record)
             else -> null
         }
@@ -44,6 +40,7 @@ internal object RecordDelegate {
     private fun createExternalRecord(record: NdefRecord): NfcRecord {
         val bean = NfcRecord()
         bean.recordType = NfcRecord.TYPE_EXTERNAL
+        bean.mediaType =  String(record.type, Charset.forName("UTF-8"))
         bean.msg = String(record.payload)
         bean.data = record.payload
         return bean
@@ -52,11 +49,12 @@ internal object RecordDelegate {
     /**
      * Constructs URL NfcRecord
      */
-    private fun createURLRecord(uri: Uri?): NfcRecord? {
-        if (uri == null) return null
+    private fun createURLRecord(record: NdefRecord): NfcRecord? {
+        if (record.toUri() == null) return null
         val bean = NfcRecord()
         bean.recordType = NfcRecord.TYPE_URI
-        bean.msg = uri.toString()
+        bean.mediaType =  String(record.type, Charset.forName("UTF-8"))
+        bean.msg = record.toUri().toString()
         bean.data = bean.msg?.toByteArray()
         return bean
     }
@@ -64,11 +62,12 @@ internal object RecordDelegate {
     /**
      * Constructs MIME  NfcRecord
      */
-    private fun createMIMERecord(mediaType: String, payload: ByteArray): NfcRecord? {
+    private fun createMIMERecord(record: NdefRecord): NfcRecord? {
         val bean = NfcRecord()
         bean.recordType = NfcRecord.TYPE_MIME
-        bean.data = payload
-        bean.msg = String(payload)
+        bean.mediaType = String(record.type, Charset.forName("UTF-8"))
+        bean.data = record.payload
+        bean.msg = String(record.payload)
         return bean
     }
 
@@ -77,7 +76,7 @@ internal object RecordDelegate {
      */
     private fun createWellKnownRecord(record: NdefRecord): NfcRecord? {
         if (Arrays.equals(record.type, NdefRecord.RTD_URI)) {
-            return createURLRecord(record.toUri())
+            return createURLRecord(record)
         }
         return if (Arrays.equals(record.type, NdefRecord.RTD_TEXT)) {
             val msg = record.toMimeType()
@@ -106,14 +105,12 @@ internal object RecordDelegate {
 
 
         val info = String(
-            payload, languageLength + 1, payload.size - languageLength - 1,
+            payload, startPos, payload.size - languageLength - 1,
             Charset.forName(textEncoding)
         )
         bean.recordType = NfcRecord.TYPE_TEXT
-        bean.data = payload.copyOfRange(startPos, payload.size)
-        bean.data?.let {
-            val ss = String(it, Charset.forName(textEncoding))
-        }
+        bean.data = payload
+        bean.mediaType = TEXT_MIME
         bean.msg = info
         return bean
     }

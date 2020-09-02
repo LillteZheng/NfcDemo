@@ -9,6 +9,7 @@ import android.nfc.tech.NdefFormatable
 import android.os.Build
 import android.util.Log
 import com.zhengsr.nfclib.NfcConverter
+import com.zhengsr.nfclib.NfcWriteListener
 import com.zhengsr.nfclib.bean.NfcRecord
 import com.zhengsr.nfclib.delegate.INFcDelegate
 import java.io.UnsupportedEncodingException
@@ -56,14 +57,33 @@ class NDEFDelegate : INFcDelegate() {
         }
     }
 
+    fun readRecords():List<NfcRecord>?{
+        val ndef = Ndef.get(tag)
+        val records = mutableListOf<NfcRecord>()
+        return try {
+            ndef?.connect()
+            val message = ndef.ndefMessage
+            message?.let {
+                it.records.forEach { record->
+                    getNfcRecord(record)?.let { nfcRecord ->
+                        records.add(nfcRecord)
+                    }
+                }
+            }
+            records
+        } catch (e: Exception) {
+            Log.d(TAG, "zsr readData: $e")
+            null
+        } finally {
+            ndef.close()
+        }
 
-    fun write(msg: String, block: (Boolean, String) -> Unit){
-        val resord = NdefRecord.createApplicationRecord("com.zhengsr.nfcdemo")
-        val message = NdefMessage(arrayOf(resord))
-        writeNdefData(block, msg.length, message)
     }
 
-    fun writeMsg(msg: String, block: (Boolean, String) -> Unit) {
+
+
+
+    fun writeMsg(msg: String, block: NfcWriteListener) {
         val record =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             NdefRecord.createTextRecord(Locale.CHINA.language, msg)
         } else {
@@ -73,31 +93,42 @@ class NDEFDelegate : INFcDelegate() {
         writeNdefData(block, msg.length, message)
     }
 
-    fun writeMime(mime:String,msg:String,block: (Boolean, String) -> Unit){
+    fun writeMime(mime:String,msg:String,block: NfcWriteListener){
         val record = NdefRecord.createMime(mime,msg.toByteArray())
         val message = NdefMessage(arrayOf(record))
         writeNdefData(block, msg.length, message)
     }
 
-    fun writeUri(uriMsg: String, block: (Boolean, String) -> Unit) {
+    fun writeUri(uriMsg: String, block: NfcWriteListener) {
         val record = NdefRecord.createUri(uriMsg)
         val message = NdefMessage(arrayOf(record))
         writeNdefData(block, uriMsg.length, message)
     }
-    fun writeUri(uri: Uri, block: (Boolean, String) -> Unit) {
+    fun writeUri(uri: Uri, block: NfcWriteListener) {
         writeUri(uri.toString(),block)
     }
-    fun writeExternal(domain:String, type:String, msg:String,block: (Boolean, String) -> Unit){
+    fun writeExternal(domain:String, type:String, msg:String,block: NfcWriteListener){
         val record = NdefRecord.createExternal(domain,type,msg.toByteArray())
         val message = NdefMessage(arrayOf(record))
         writeNdefData(block, msg.length, message)
     }
 
 
+    fun writeNDEFRecord(vararg records: NdefRecord, block: NfcWriteListener){
+        var size  = 0;
+        records.forEach {
+           size =  it.payload.size
+        }
+        val message = NdefMessage(records)
+        writeNdefData(block,size,message)
+
+    }
+
+
     /**
      * 写NDEF数据
      */
-    private fun writeNdefData(block: (Boolean, String) -> Unit, dataSize: Int, message: NdefMessage) {
+    private fun writeNdefData(block: NfcWriteListener, dataSize: Int, message: NdefMessage) {
         val ndef = Ndef.get(tag)
         try {
             if (ndef != null) {

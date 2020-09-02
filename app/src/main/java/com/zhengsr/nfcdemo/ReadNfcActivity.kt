@@ -2,6 +2,8 @@ package com.zhengsr.nfcdemo
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.tech.Ndef
 import android.os.Bundle
@@ -23,6 +25,8 @@ class ReadNfcActivity : AppCompatActivity() {
     private var pendingIntent: PendingIntent? = null
     private lateinit var cardContent: TextView
     private lateinit var cardId : TextView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
@@ -90,45 +94,27 @@ class ReadNfcActivity : AppCompatActivity() {
     fun write(view: View) {
         val msgEd = findViewById<EditText>(R.id.msg_ed)
         val msg = msgEd.text.toString()
-        val domain = "com.zhengsr.nfcdemo" //usually your app's package name
-        val type = "externalType"
+
+        val aarRecord = NdefRecord.createApplicationRecord("com.zhengsr.nfcdemo")
         val mime = "application/com.zhengsr.nfctest";
-        ZNfc.getNDEFDelegate().writeMime(mime,msg){ isSuccess, result->
+        val extRecord = NdefRecord.createMime(mime, msg.toByteArray())
+
+        ZNfc.getNDEFDelegate().writeNDEFRecord(extRecord,aarRecord){ isSuccess,result ->
             if (isSuccess){
-                Toast.makeText(this, "数据写入成功", Toast.LENGTH_SHORT).show()
-                if (ZNfc.getType() == NfcType.EDEF) {
-                    val data = ZNfc.getNDEFDelegate().readRecord()
-                    data?.let {
-                        cardContent.text = it.msg
+                Toast.makeText(this, "写入成功!", Toast.LENGTH_SHORT).show()
+                val records = ZNfc.getNDEFDelegate().readRecords()
+                records?.let {
+                    it.forEach {nfcRecord ->
+                        Log.d(TAG, "zsr write: $nfcRecord")
                     }
                 }
             }else{
-                Toast.makeText(this, "数据写入失败: $result", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "写入失败: $result", Toast.LENGTH_SHORT).show()
             }
-            msgEd.setText("")
         }
 
     }
 
-   /* override fun onTagDiscovered(tag: Tag?) {
-        Log.d(TAG, "zsr onTagDiscovered: $tag")
-        val isoDep = IsoDep.get(tag)
-        if (isoDep != null){
-            isoDep.connect()
-            val AID = "F123466666"
-            //转换指令为byte[]
-            //转换指令为byte[]
-            val command: ByteArray = buildSelectApdu(AID)
-            Log.d(TAG, "zsr onTagDiscovered: ${command.contentToString()}")
-
-            // 发送指令
-
-            // 发送指令
-            val result = isoDep.transceive(command)
-            Log.d(TAG, "zsr result: ${result.contentToString()}")
-        }
-
-    }*/
 
     private fun buildSelectApdu(aid: String): ByteArray {
         val HEADER = "00A40400"
